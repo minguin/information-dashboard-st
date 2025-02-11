@@ -43,6 +43,7 @@ chmod +x deploy.sh
 - ECRリポジトリの作成
 - Dockerイメージのビルドとタグ付け
 - ECRへのプッシュ
+- 強制デプロイ
 
 カスタマイズ可能な環境変数：
 - AWS_REGION: AWSリージョン（デフォルト: ap-northeast-1）
@@ -80,6 +81,12 @@ docker tag information-dashboard-st-frontend ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northe
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/information-dashboard:backend
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/information-dashboard:frontend
 ```
+6. 強制デプロイ
+```bash
+aws ecs update-service --cluster information-dashboard --service information-dashboard-backend --force-new-deployment
+aws ecs update-service --cluster information-dashboard --service information-dashboard-frontend --force-new-deployment
+```
+
 ### ターゲットグループの設定
 - フロントエンドとバックエンドの二つ作成する
   - フロントエンド：IPアドレス、portは8501、ヘルスチェックは/healthz

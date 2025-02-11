@@ -25,8 +25,7 @@ async def redirect_with_logging(
             # DynamoDBにクリックログを記録
             dynamodb = settings.dynamodb_client
             table = dynamodb.Table(settings.DYNAMODB_TABLE)
-            # コンテナの環境変数TZがAsia/Tokyoに設定されているので、
-            # datetime.now()は自動的にJSTを返す
+            # コンテナの環境変数TZがAsia/Tokyoに設定されているので、datetime.now()は自動的にJSTを返す
             item = {
                 'timestamp': datetime.now().isoformat(),
                 'session_id': session_id,
@@ -36,9 +35,8 @@ async def redirect_with_logging(
             response = table.put_item(Item=item)            
         except Exception as db_error:
             print(f"DynamoDB error: {str(db_error)}")
-            # DynamoDBのエラーがあってもリダイレクトは続行
-        
-        # 指定されたURLにリダイレクト
+                    
+        # 指定されたURLにリダイレクト（DynamoDBのエラーがあってもリダイレクトは続行）
         return RedirectResponse(url=decoded_url)
     except Exception as e:
         return {"status": "error", "message": str(e)}

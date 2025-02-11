@@ -27,12 +27,17 @@ docker-compose build
 
 # イメージのタグ付け
 echo "Tagging images..."
-docker tag information-dashboard-st_backend ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:backend
-docker tag information-dashboard-st_frontend ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:frontend
+docker tag information-dashboard-st-backend ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:backend
+docker tag information-dashboard-st-frontend ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:frontend
 
 # イメージのプッシュ
 echo "Pushing images to ECR..."
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:backend
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/information-dashboard:frontend
+
+# イメージのプッシュ
+echo "force-new-deployment..."
+aws ecs update-service --cluster information-dashboard --service information-dashboard-backend2 --force-new-deployment
+aws ecs update-service --cluster information-dashboard --service information-dashboard-frontend2 --force-new-deployment
 
 echo "Deployment completed successfully!"
