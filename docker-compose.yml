@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_REGION=${AWS_REGION:-ap-northeast-1}
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - TZ=Asia/Tokyo
+    volumes:
+      - ~/.aws:/root/.aws:ro  # AWS認証情報をマウント（ローカル開発用）
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://localhost:8000  # ローカル環境用のバックエンドURL
+      - TZ=Asia/Tokyo
+    depends_on:
+      - backend

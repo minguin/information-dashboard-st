@@ -1,4 +1,5 @@
 import boto3
+import os
 from typing import Optional, List
 
 class Settings:
@@ -28,6 +29,14 @@ class Settings:
     def dynamodb_client(self) -> Optional[boto3.resource]:
         """DynamoDB クライアントを取得"""
         try:
+            # ECS環境で実行されているかチェック
+            if os.getenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI"):
+                return boto3.resource(
+                    'dynamodb',
+                    region_name=self.AWS_REGION
+                )
+            
+            # ローカル環境の場合
             session = boto3.Session(
                 profile_name=self.AWS_PROFILE,
                 region_name=self.AWS_REGION

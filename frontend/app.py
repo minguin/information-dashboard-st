@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from urllib.parse import quote
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
@@ -6,6 +7,9 @@ def main():
     # セッションIDを取得
     session_id = get_script_run_ctx().session_id
     st.sidebar.info(f"Session ID:  \n{session_id}")
+
+    # バックエンドのURLを環境変数から取得（デフォルトはローカル開発用）
+    BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
     # ポータルサイトの定義
     portal_sites = [
@@ -23,7 +27,7 @@ def main():
         # URLエンコードしてFastAPIのリダイレクトエンドポイントを作成
         encoded_url = quote(site['url'])
         encoded_name = quote(site['name'])
-        redirect_url = f"http://localhost:8000/api/redirect/{encoded_name}?url={encoded_url}&session_id={session_id}"
+        redirect_url = f"{BACKEND_URL}/api/redirect/{encoded_name}?url={encoded_url}&session_id={session_id}"
         
         # テーブル行を作成
         table_rows.append(

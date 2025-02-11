@@ -6,6 +6,10 @@ from core.config import settings
 
 router = APIRouter()
 
+@router.get("/healthz")
+async def healthz():
+    return {"message": "OK"}
+
 @router.get("/redirect/{site_name}")
 async def redirect_with_logging(
     site_name: str,
@@ -20,16 +24,16 @@ async def redirect_with_logging(
         try:
             # DynamoDBにクリックログを記録
             dynamodb = settings.dynamodb_client
-            if dynamodb:
-                table = dynamodb.Table(settings.DYNAMODB_TABLE)
-                response = table.put_item(
-                    Item={
-                        'timestamp': datetime.now().isoformat(),
-                        'session_id': session_id,
-                        'site_name': decoded_site_name,
-                        'url': decoded_url
-                    }
-                )
+            table = dynamodb.Table(settings.DYNAMODB_TABLE)
+            # コンテナの環境変数TZがAsia/Tokyoに設定されているので、
+            # datetime.now()は自動的にJSTを返す
+            item = {
+                'timestamp': datetime.now().isoformat(),
+                'session_id': session_id,
+                'site_name': decoded_site_name,
+                'url': decoded_url
+            }
+            response = table.put_item(Item=item)            
         except Exception as db_error:
             print(f"DynamoDB error: {str(db_error)}")
             # DynamoDBのエラーがあってもリダイレクトは続行
